@@ -937,13 +937,40 @@
               result;
           if (data){
             if ($select.multiple){
-              var resultMultiple = [];
+              var resultMultiple = [],
+                parseValue,
+                unshiftResult;
               var checkFnMultiple = function(list, value){
                 if (!list || !list.length) return;
                 for (var p = list.length - 1; p >= 0; p--) {
+                  unshiftResult = false;
                   locals[$select.parserResult.itemName] = list[p];
                   result = $select.parserResult.modelMapper(scope, locals);
-                  if (result == value){
+                  locals[$select.parserResult.itemName] = value;
+                  parseValue = $select.parserResult.modelMapper(scope, locals);
+
+                  if (parseValue) {
+                    if (angular.isObject(result)) {
+                      if (angular.equals(result, parseValue)) {
+                        unshiftResult = true;
+                      }
+                    } else {
+                      if (result == parseValue) {
+                        unshiftResult = true;
+                      }
+                    }
+                  } else {
+                    if (angular.isObject(result)) {
+                      if (angular.equals(result, value)) {
+                        unshiftResult = true;
+                      }
+                    } else {
+                      if (result == value) {
+                        unshiftResult = true;
+                      }
+                    }
+                  }
+                  if (unshiftResult) {
                     resultMultiple.unshift(list[p]);
                     return true;
                   }
