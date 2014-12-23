@@ -153,18 +153,6 @@ app.controller('DemoCtrl', function($scope, $http, $timeout) {
     });
   };
 
-  $scope.populate = function(persons) {
-    if (!persons) {
-      return;
-    }
-    $scope.multipleDemo.populateSelection = [];
-    $timeout(function() {
-      angular.forEach(persons, function(value) {
-        $scope.multipleDemo.populateSelection.push(value);
-      });
-    });
-  };
-
   $scope.country = {};
   $scope.countries = [ // Taken from https://gist.github.com/unceus/6501985
     {name: 'Afghanistan', code: 'AF'},
