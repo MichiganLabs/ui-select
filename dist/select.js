@@ -1,7 +1,7 @@
 /*!
  * ui-select
  * http://github.com/angular-ui/ui-select
- * Version: 0.9.5 - 2014-12-12T16:07:20.856Z
+ * Version: 0.9.4.1 - 2014-12-23T15:41:12.401Z
  * License: MIT
  */
 
@@ -418,7 +418,8 @@
                   item = ctrl.tagging.fct(ctrl.search);
                 // if item type is 'string', apply the tagging label
                 } else if ( typeof item === 'string' ) {
-                  item = item.replace(ctrl.taggingLabel,'');
+                  // trim the trailing space
+                  item = item.replace(ctrl.taggingLabel,'').trim();
                 }
               }
             }
@@ -439,9 +440,11 @@
             ctrl.selected = item;
           }
 
-          ctrl.onSelectCallback($scope, {
+          $timeout(function(){
+            ctrl.onSelectCallback($scope, {
               $item: item,
               $model: ctrl.parserResult.modelMapper($scope, locals)
+            });
           });
 
           if (!ctrl.multiple || ctrl.closeOnSelect) {
@@ -503,9 +506,12 @@
       ctrl.activeMatchIndex = -1;
       ctrl.sizeSearchInput();
 
-      ctrl.onRemoveCallback($scope, {
-        $item: removedChoice,
-        $model: ctrl.parserResult.modelMapper($scope, locals)
+      // Give some time for scope propagation.
+      $timeout(function(){
+        ctrl.onRemoveCallback($scope, {
+          $item: removedChoice,
+          $model: ctrl.parserResult.modelMapper($scope, locals)
+        });
       });
     };
 
@@ -945,6 +951,13 @@
                 for (var p = list.length - 1; p >= 0; p--) {
                   locals[$select.parserResult.itemName] = list[p];
                   result = $select.parserResult.modelMapper(scope, locals);
+                  if($select.parserResult.trackByExp){
+                      var matches = /\.(.+)/.exec($select.parserResult.trackByExp);
+                      if(matches.length>0 && result[matches[1]] == value[matches[1]]){
+                          resultMultiple.unshift(list[p]);
+                          return true;
+                      }
+                  }
                   if (result == value){
                     resultMultiple.unshift(list[p]);
                     return true;
